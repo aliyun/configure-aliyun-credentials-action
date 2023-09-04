@@ -1,0 +1,24 @@
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+  role-arn: 
+    description: 'The ARN of role. format: acs:ram::USER_Id:role/ROLE_NAME'
+    required: false
+  oidc-provider-arn:
+    description: 'The ARN of OIDC provider. format: acs:ram::USER_Id:oidc-provider/ROLE_NAME'
+    required: false
+  role-to-assume:
+    description: 'The ARN of role to assume'
+    required: false
+
+outputs:
+  aliyun-access-key-id:
+    description: The alibaba cloud access key ID for the provided credentials
+  aliyun-access-key-secret:
+    description: The alibaba cloud access key secret for the provided credentials
+  aliyun-security-token:
+    description: The alibaba cloud security token for the provided credentials
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+  post: 'dist/cleanup.js'

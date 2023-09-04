@@ -1,0 +1,20 @@
+{
+  "name": "configure-aliyun-credentials-action-for-github-actions",
+  "version": "1.0.0",
+  "scripts": {
+    "build-main": "ncc build index.js -o dist/main --source-map --license licenses.txt",
+    "build-cleanup": "ncc build cleanup.js -o dist/cleanup --source-map --license licenses.txt",
+    "build": "npm run build-main && npm run build-cleanup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@alicloud/credentials": "^2.2.6"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.36.1"
+  }
+}
