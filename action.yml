@@ -7,6 +7,10 @@ inputs:
   role-to-assume:
     description: 'The ARN of role to assume. format: acs:ram::USER_Id:role/ROLE_NAME'
     required: false
+  audience:
+    description: 'The audience to use for the OIDC provider'
+    required: false
+    default: 'github-actions'
 
 outputs:
   aliyun-access-key-id:
@@ -15,6 +19,7 @@ outputs:
     description: The alibaba cloud access key secret for the provided credentials
   aliyun-security-token:
     description: The alibaba cloud security token for the provided credentials
+
 runs:
   using: 'node16'
   main: 'dist/main/index.js'
