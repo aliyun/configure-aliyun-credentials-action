@@ -19,3 +19,7 @@ runs:
   using: 'node16'
   main: 'dist/index.js'
   post: 'dist/cleanup.js'
+
+branding:
+  color: orange
+  icon: cloud
