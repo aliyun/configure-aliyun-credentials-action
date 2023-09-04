@@ -17,8 +17,8 @@ outputs:
     description: The alibaba cloud security token for the provided credentials
 runs:
   using: 'node16'
-  main: 'dist/index.js'
-  post: 'dist/cleanup.js'
+  main: 'dist/main/index.js'
+  post: 'dist/cleanup/index.js'
 
 branding:
   color: orange
