@@ -7,8 +7,12 @@
     "build-cleanup": "ncc build cleanup.js -o dist/cleanup --source-map --license licenses.txt",
     "build": "npm run build-main && npm run build-cleanup"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["Alibaba Cloud", "aliyun", "credentials", "OpenAPI"],
+  "author": {
+    "name": "Alibaba Cloud OpenAPI Team",
+    "url": "https://www.aliyun.com",
+    "organization": true
+  },
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.10.0",
