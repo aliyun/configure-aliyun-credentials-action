@@ -1,14 +1,11 @@
 name: '"Configure Alibaba Cloud Credentials" Action for GitHub Actions'
 description: 'Configures Alibaba Cloud credentials for use in subsequent steps in a GitHub Action workflow'
 inputs:
-  role-arn: 
-    description: 'The ARN of role. format: acs:ram::USER_Id:role/ROLE_NAME'
-    required: false
   oidc-provider-arn:
     description: 'The ARN of OIDC provider. format: acs:ram::USER_Id:oidc-provider/ROLE_NAME'
     required: false
   role-to-assume:
-    description: 'The ARN of role to assume'
+    description: 'The ARN of role to assume. format: acs:ram::USER_Id:role/ROLE_NAME'
     required: false
 
 outputs:
