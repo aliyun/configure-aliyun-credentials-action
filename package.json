@@ -1,5 +1,6 @@
 {
-  "name": "configure-aliyun-credentials-action-for-github-actions",
+  "name": "configure-aliyun-credentials",
+  "description": "A GitHub Action to configure Alibaba Cloud credentials",
   "version": "1.0.0",
   "scripts": {
     "build-main": "ncc build index.js -o dist/main --source-map --license licenses.txt",
