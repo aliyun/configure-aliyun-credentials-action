@@ -1,5 +1,5 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: '"Configure Alibaba Cloud Credentials" Action for GitHub Actions'
+description: 'Configures Alibaba Cloud credentials for use in subsequent steps in a GitHub Action workflow'
 inputs:
   role-arn: 
     description: 'The ARN of role. format: acs:ram::USER_Id:role/ROLE_NAME'
