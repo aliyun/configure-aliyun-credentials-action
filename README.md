@@ -32,7 +32,7 @@ The alibaba cloud security token for the provided credentials.
 ### Using with OIDC
 
 ```yaml
-uses: actions/configure-aliyun-credentials@v1
+uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
   oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/ROLE_NAME'
@@ -45,13 +45,13 @@ that already has configured with RAM role, such as ECS/ECI instance, then you do
 to provide any credentials to this action.
 
 ```yaml
-uses: actions/configure-aliyun-credentials@v1
+uses: aliyun/configure-aliyun-credentials-action@v1
 ```
 
 When you ant to assume another role, use `role-to-assume` please.
 
 ```yaml
-uses: actions/configure-aliyun-credentials@v1
+uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLENAME'
 ```
