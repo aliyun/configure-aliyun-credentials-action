@@ -13,6 +13,10 @@ Environment variable exports are detected by both the Alibaba Cloud SDKs and the
 
 **Optional**: The ARN of role to assume. format: `acs:ram::USER_Id:role/ROLE_NAME` .
 
+### `audience`:
+
+**Optional**: The audience to use for the OIDC provider. default: `github-actions`.
+
 ## Outputs
 
 ### `aliyun-access-key-id`
