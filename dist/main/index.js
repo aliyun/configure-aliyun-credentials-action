@@ -1915,6 +1915,9 @@ class Credential {
     getType() {
         return this.credential.getType();
     }
+    getCredential() {
+        return this.credential.getCredential();
+    }
     load(config, runtime) {
         if (!config) {
             this.credential = DefaultProvider.getCredentials();
@@ -2034,12 +2037,70 @@ exports["default"] = Config;
 
 /***/ }),
 
-/***/ 3173:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 5503:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const $tea = __importStar(__nccwpck_require__(4165));
+class CredentialModel extends $tea.Model {
+    constructor(map) {
+        super(map);
+    }
+    static names() {
+        return {
+            accessKeyId: 'accessKeyId',
+            accessKeySecret: 'accessKeySecret',
+            securityToken: 'securityToken',
+            bearerToken: 'bearerToken',
+            type: 'type',
+        };
+    }
+    static types() {
+        return {
+            accessKeyId: 'string',
+            accessKeySecret: 'string',
+            securityToken: 'string',
+            bearerToken: 'string',
+            type: 'string',
+        };
+    }
+}
+exports["default"] = CredentialModel;
+//# sourceMappingURL=credential_model.js.map
+
+/***/ }),
+
+/***/ 3173:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const credential_model_1 = __importDefault(__nccwpck_require__(5503));
 class DefaultCredential {
     constructor(config) {
         this.accessKeyId = config.accessKeyId || '';
@@ -2062,6 +2123,15 @@ class DefaultCredential {
     }
     getType() {
         return this.type;
+    }
+    async getCredential() {
+        return new credential_model_1.default({
+            accessKeyId: this.accessKeyId,
+            accessKeySecret: this.accessKeySecret,
+            securityToken: this.securityToken,
+            bearerToken: this.bearerToken,
+            type: this.type,
+        });
     }
 }
 exports["default"] = DefaultCredential;
@@ -2473,6 +2543,7 @@ class RamRoleArnCredential extends session_credential_1.default {
             type: 'ram_role_arn',
             accessKeyId: config.accessKeyId,
             accessKeySecret: config.accessKeySecret,
+            securityToken: config.securityToken
         });
         super(conf);
         this.roleArn = config.roleArn;
@@ -2485,6 +2556,7 @@ class RamRoleArnCredential extends session_credential_1.default {
     async updateCredential() {
         const params = {
             accessKeyId: this.accessKeyId,
+            securityToken: this.securityToken,
             roleArn: this.roleArn,
             action: 'AssumeRole',
             durationSeconds: this.durationSeconds,
@@ -2602,12 +2674,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const default_credential_1 = __importDefault(__nccwpck_require__(3173));
 const utils = __importStar(__nccwpck_require__(6517));
 const config_1 = __importDefault(__nccwpck_require__(2944));
+const credential_model_1 = __importDefault(__nccwpck_require__(5503));
 class SessionCredential extends default_credential_1.default {
     constructor(config) {
         const conf = new config_1.default({
             type: config.type,
             accessKeyId: config.accessKeyId,
             accessKeySecret: config.accessKeySecret,
+            securityToken: config.securityToken
         });
         super(conf);
         this.sessionCredential = null;
@@ -2643,6 +2717,16 @@ class SessionCredential extends default_credential_1.default {
             return true;
         }
         return false;
+    }
+    async getCredential() {
+        await this.ensureCredential();
+        return new credential_model_1.default({
+            accessKeyId: this.sessionCredential.AccessKeyId,
+            accessKeySecret: this.sessionCredential.AccessKeySecret,
+            securityToken: this.sessionCredential.SecurityToken,
+            bearerToken: this.bearerToken,
+            type: this.type,
+        });
     }
 }
 exports["default"] = SessionCredential;
@@ -6365,7 +6449,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@alicloud/credentials","version":"2.2.6","description":"alibaba cloud node.js sdk credentials","main":"dist/src/client.js","scripts":{"prepublishOnly":"tsc","build":"tsc","lint":"eslint --fix ./src --ext .ts","test":"mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000","cov":"nyc -e .ts -r=html -r=text -r=lcov npm run test","ci":"npm run cov && codecov","test-integration":"mocha -b -r ts-node/register -R spec test/*.integration.ts","clean":"rm -rf coverage"},"repository":{"type":"git","url":"git+https://github.com/aliyun/nodejs-credentials.git"},"keywords":["alibaba cloud","sdk","credentials"],"author":"Alibaba Cloud SDK","license":"MIT","devDependencies":{"@types/expect.js":"^0.3.29","@types/ini":"^1.3.30","@types/mocha":"^7.0.1","@types/rewire":"^2.5.28","@typescript-eslint/eslint-plugin":"^4.31.2","@typescript-eslint/parser":"^4.31.2","codecov":"^3.1.0","eslint":"^7.32.0","expect.js":"^0.3.1","mm":"^2.4.1","mocha":"^10.1.0","nyc":"^13.1.0","rewire":"^4.0.1","ts-node":"^8.6.2","typescript":"^3.7.5"},"dependencies":{"@alicloud/tea-typescript":"^1.5.3","httpx":"^2.2.0","ini":"^1.3.5","kitx":"^2.0.0"},"bugs":{"url":"https://github.com/aliyun/nodejs-credentials/issues"},"homepage":"https://github.com/aliyun/nodejs-credentials#readme","files":["src","dist"]}');
+module.exports = JSON.parse('{"name":"@alicloud/credentials","version":"2.3.0","description":"alibaba cloud node.js sdk credentials","main":"dist/src/client.js","scripts":{"prepublishOnly":"tsc","build":"tsc","lint":"eslint --fix ./src --ext .ts","test":"mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000","cov":"nyc -e .ts -r=html -r=text -r=lcov npm run test","ci":"npm run cov","test-integration":"mocha -b -r ts-node/register -R spec test/*.integration.ts","clean":"rm -rf coverage"},"repository":{"type":"git","url":"git+https://github.com/aliyun/nodejs-credentials.git"},"keywords":["alibaba cloud","sdk","credentials"],"author":"Alibaba Cloud SDK","license":"MIT","devDependencies":{"@types/expect.js":"^0.3.29","@types/ini":"^1.3.30","@types/mocha":"^7.0.1","@types/rewire":"^2.5.28","@typescript-eslint/eslint-plugin":"^4.31.2","@typescript-eslint/parser":"^4.31.2","eslint":"^7.32.0","expect.js":"^0.3.1","mm":"^2.4.1","mocha":"^10.1.0","nyc":"^13.1.0","rewire":"^4.0.1","ts-node":"^8.6.2","typescript":"^3.7.5"},"dependencies":{"@alicloud/tea-typescript":"^1.5.3","httpx":"^2.2.0","ini":"^1.3.5","kitx":"^2.0.0"},"bugs":{"url":"https://github.com/aliyun/nodejs-credentials/issues"},"homepage":"https://github.com/aliyun/nodejs-credentials#readme","files":["src","dist"]}');
 
 /***/ })
 
@@ -6440,7 +6524,7 @@ async function run() {
   const oidcProviderArn = core.getInput('oidc-provider-arn');
   if (roleToAssume && oidcProviderArn) {
     const audience = core.getInput('audience');
-    const idToken = await core.getIDToken(audience || 'github-actions');
+    const idToken = await core.getIDToken(audience);
     const oidcTokenFilePath = path.join(os.tmpdir(), 'token');
     // write into token file
     await fsx.writeFile(oidcTokenFilePath, idToken);
