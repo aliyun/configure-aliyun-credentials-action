@@ -1,0 +1,28 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  oidc:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Set up aliyun CLI
+        uses: aliyun/setup-aliyun-cli-action@v1-beta
+
+      - uses: actions/checkout@v3
+
+      - name: Configure credentials
+        uses: ./
+        with:
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          oidc-provider-arn: ${{ secrets.OIDC_PROVIDER_ARN }}
+
+      - name: Who am I
+        run: aliyun sts GetCallerIdentity --region cn-hangzhou
