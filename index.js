@@ -26,7 +26,7 @@ async function run() {
   const oidcProviderArn = core.getInput('oidc-provider-arn');
   if (roleToAssume && oidcProviderArn) {
     const audience = core.getInput('audience');
-    const idToken = await core.getIDToken(audience || 'github-actions');
+    const idToken = await core.getIDToken(audience);
     const oidcTokenFilePath = path.join(os.tmpdir(), 'token');
     // write into token file
     await fsx.writeFile(oidcTokenFilePath, idToken);
