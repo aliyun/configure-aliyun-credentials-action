@@ -10,7 +10,7 @@ inputs:
   audience:
     description: 'The audience to use for the OIDC provider'
     required: false
-    default: 'github-actions'
+    default: 'sts.aliyuncs.com'
 
 outputs:
   aliyun-access-key-id:
