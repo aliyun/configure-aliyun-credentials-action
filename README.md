@@ -39,7 +39,7 @@ The alibaba cloud security token for the provided credentials.
 uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
-  oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/ROLE_NAME'
+  oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
 ```
 
 ### Using with ECS RAM role
