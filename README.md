@@ -52,7 +52,7 @@ to provide any credentials to this action.
 uses: aliyun/configure-aliyun-credentials-action@v1
 ```
 
-When you ant to assume another role, use `role-to-assume` please.
+When you want to assume another role, use `role-to-assume` please.
 
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
