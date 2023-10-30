@@ -7,7 +7,7 @@ Environment variable exports are detected by both the Alibaba Cloud SDKs and the
 
 ### `oidc-provider-arn`
 
-**Optional**: The ARN of OIDC provider. format: `acs:ram::USER_Id:oidc-provider/ROLE_NAME` .
+**Optional**: The ARN of OIDC provider. format: `acs:ram::USER_Id:oidc-provider/PROVIDER_NAME` .
 
 ### `role-to-assume`
 
