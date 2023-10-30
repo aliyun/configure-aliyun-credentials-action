@@ -81,6 +81,7 @@ async function run() {
 
 if (require.main === module) {
   run().catch((err) => {
+    console.log(err.stack);
     core.setFailed(err.message);
   });
 }
