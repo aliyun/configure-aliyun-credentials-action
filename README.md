@@ -3,6 +3,8 @@
 Configure your Alibaba Cloud credentials environment variables for use in other GitHub Actions.
 Environment variable exports are detected by both the Alibaba Cloud SDKs and the Alibaba Cloud CLI for API calls.
 
+[![Test](https://github.com/aliyun/configure-aliyun-credentials-action/actions/workflows/test.yaml/badge.svg)](https://github.com/aliyun/configure-aliyun-credentials-action/actions/workflows/test.yaml)
+
 ## Inputs
 
 ### `oidc-provider-arn`
