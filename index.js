@@ -13,9 +13,12 @@ const Config = acc.Config;
 const ROLE_SESSION_NAME = 'github-action-session';
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
-  core.setSecret('aliyun-access-key-id', accessKeyId);
-  core.setSecret('aliyun-access-key-secret', accessKeySecret);
-  core.setSecret('aliyun-security-token', securityToken);
+  core.setSecret(accessKeyId);
+  core.setSecret(accessKeySecret);
+  core.setSecret(securityToken);
+  core.setOutput('aliyun-access-key-id', accessKeyId);
+  core.setOutput('aliyun-access-key-secret', accessKeySecret);
+  core.setOutput('aliyun-security-token', securityToken);
   // use standard environment variables
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
