@@ -558,7 +558,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -1934,7 +1934,7 @@ class Credential {
                 this.credential = new sts_token_credential_1.default(config.accessKeyId, config.accessKeySecret, config.securityToken);
                 break;
             case 'ecs_ram_role':
-                this.credential = new ecs_ram_role_credential_1.default(config.roleName);
+                this.credential = new ecs_ram_role_credential_1.default(config.roleName, runtime, config.enableIMDSv2, config.metadataTokenDuration);
                 break;
             case 'ram_role_arn':
                 this.credential = new ram_role_arn_credential_1.default(config, runtime);
@@ -2005,6 +2005,8 @@ class Config extends $tea.Model {
             publicKeyId: 'publicKeyId',
             privateKeyFile: 'privateKeyFile',
             roleName: 'roleName',
+            enableIMDSv2: 'enableIMDSv2',
+            metadataTokenDuration: 'metadataTokenDuration',
             credentialsURI: 'credentialsURI',
             oidcProviderArn: 'oidcProviderArn',
             oidcTokenFilePath: 'oidcTokenFilePath',
@@ -2025,6 +2027,8 @@ class Config extends $tea.Model {
             publicKeyId: 'string',
             privateKeyFile: 'string',
             roleName: 'string',
+            enableIMDSv2: 'boolean',
+            metadataTokenDuration: 'number',
             credentialsURI: 'string',
             oidcProviderArn: 'string',
             oidcTokenFilePath: 'string',
@@ -2152,24 +2156,54 @@ const session_credential_1 = __importDefault(__nccwpck_require__(1206));
 const httpx_1 = __importDefault(__nccwpck_require__(9074));
 const config_1 = __importDefault(__nccwpck_require__(2944));
 const SECURITY_CRED_URL = 'http://100.100.100.200/latest/meta-data/ram/security-credentials/';
+const SECURITY_CRED_TOKEN_URL = 'http://100.100.100.200/latest/api/token';
 class EcsRamRoleCredential extends session_credential_1.default {
-    constructor(roleName = '', runtime = {}) {
+    constructor(roleName = '', runtime = {}, enableIMDSv2 = false, metadataTokenDuration = 21600) {
         const conf = new config_1.default({
             type: 'ecs_ram_role',
         });
         super(conf);
         this.roleName = roleName;
+        this.enableIMDSv2 = enableIMDSv2;
+        this.metadataTokenDuration = metadataTokenDuration;
         this.runtime = runtime;
         this.sessionCredential = null;
+        this.metadataToken = null;
+        this.staleTime = 0;
     }
-    async getBody(url) {
-        const response = await httpx_1.default.request(url, {});
+    async getBody(url, options = {}) {
+        const response = await httpx_1.default.request(url, options);
         return (await httpx_1.default.read(response, 'utf8'));
     }
+    async getMetadataToken() {
+        if (this.needToRefresh()) {
+            let tmpTime = new Date().getTime() + this.metadataTokenDuration * 1000;
+            const response = await httpx_1.default.request(SECURITY_CRED_TOKEN_URL, {
+                headers: {
+                    'X-aliyun-ecs-metadata-token-ttl-seconds': `${this.metadataTokenDuration}`
+                }
+            });
+            if (response.statusCode !== 200) {
+                throw new Error(`Failed to get token from ECS Metadata Service. HttpCode=${response.statusCode}`);
+            }
+            this.staleTime = tmpTime;
+            return (await httpx_1.default.read(response, 'utf8'));
+        }
+        return this.metadataToken;
+    }
     async updateCredential() {
+        let options = {};
+        if (this.enableIMDSv2) {
+            this.metadataToken = await this.getMetadataToken();
+            options = {
+                headers: {
+                    'X-aliyun-ecs-metadata-token': this.metadataToken
+                }
+            };
+        }
         const roleName = await this.getRoleName();
         const url = SECURITY_CRED_URL + roleName;
-        const body = await this.getBody(url);
+        const body = await this.getBody(url, options);
         const json = JSON.parse(body);
         this.sessionCredential = {
             AccessKeyId: json.AccessKeyId,
@@ -2183,6 +2217,9 @@ class EcsRamRoleCredential extends session_credential_1.default {
             return this.roleName;
         }
         return await this.getBody(SECURITY_CRED_URL);
+    }
+    needToRefresh() {
+        return new Date().getTime() >= this.staleTime;
     }
 }
 exports["default"] = EcsRamRoleCredential;
@@ -2342,8 +2379,9 @@ const ecs_ram_role_credential_1 = __importDefault(__nccwpck_require__(4089));
 exports["default"] = {
     getCredential() {
         const roleName = process.env.ALIBABA_CLOUD_ECS_METADATA;
+        const enableIMDSv2 = process.env.ALIBABA_CLOUD_ECS_IMDSV2_ENABLE;
         if (roleName && roleName.length) {
-            return new ecs_ram_role_credential_1.default(roleName);
+            return new ecs_ram_role_credential_1.default(roleName, {}, enableIMDSv2 && enableIMDSv2.toLowerCase() === 'true');
         }
         return null;
     }
@@ -6449,7 +6487,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@alicloud/credentials","version":"2.3.0","description":"alibaba cloud node.js sdk credentials","main":"dist/src/client.js","scripts":{"prepublishOnly":"tsc","build":"tsc","lint":"eslint --fix ./src --ext .ts","test":"mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000","cov":"nyc -e .ts -r=html -r=text -r=lcov npm run test","ci":"npm run cov","test-integration":"mocha -b -r ts-node/register -R spec test/*.integration.ts","clean":"rm -rf coverage"},"repository":{"type":"git","url":"git+https://github.com/aliyun/nodejs-credentials.git"},"keywords":["alibaba cloud","sdk","credentials"],"author":"Alibaba Cloud SDK","license":"MIT","devDependencies":{"@types/expect.js":"^0.3.29","@types/ini":"^1.3.30","@types/mocha":"^7.0.1","@types/rewire":"^2.5.28","@typescript-eslint/eslint-plugin":"^4.31.2","@typescript-eslint/parser":"^4.31.2","eslint":"^7.32.0","expect.js":"^0.3.1","mm":"^2.4.1","mocha":"^10.1.0","nyc":"^13.1.0","rewire":"^4.0.1","ts-node":"^8.6.2","typescript":"^3.7.5"},"dependencies":{"@alicloud/tea-typescript":"^1.5.3","httpx":"^2.2.0","ini":"^1.3.5","kitx":"^2.0.0"},"bugs":{"url":"https://github.com/aliyun/nodejs-credentials/issues"},"homepage":"https://github.com/aliyun/nodejs-credentials#readme","files":["src","dist"]}');
+module.exports = JSON.parse('{"name":"@alicloud/credentials","version":"2.3.1","description":"alibaba cloud node.js sdk credentials","main":"dist/src/client.js","scripts":{"prepublishOnly":"tsc","build":"tsc","lint":"eslint --fix ./src --ext .ts","test":"mocha -b -r ts-node/register test/**/*.test.ts test/*.test.ts --timeout 15000","cov":"nyc -e .ts -r=html -r=text -r=lcov npm run test","ci":"npm run cov","test-integration":"mocha -b -r ts-node/register -R spec test/*.integration.ts","clean":"rm -rf coverage"},"repository":{"type":"git","url":"git+https://github.com/aliyun/nodejs-credentials.git"},"keywords":["alibaba cloud","sdk","credentials"],"author":"Alibaba Cloud SDK","license":"MIT","devDependencies":{"@types/expect.js":"^0.3.29","@types/ini":"^1.3.30","@types/mocha":"^10.0.6","@types/rewire":"^2.5.28","@typescript-eslint/eslint-plugin":"^6.18.1","@typescript-eslint/parser":"^6.18.1","eslint":"^8.56.0","expect.js":"^0.3.1","mm":"^2.4.1","mocha":"^10.1.0","nyc":"^15.1.0","rewire":"^7.0.0","ts-node":"^10.9.2","typescript":"^3.7.5"},"dependencies":{"@alicloud/tea-typescript":"^1.5.3","httpx":"^2.2.0","ini":"^1.3.5","kitx":"^2.0.0"},"bugs":{"url":"https://github.com/aliyun/nodejs-credentials/issues"},"homepage":"https://github.com/aliyun/nodejs-credentials#readme","files":["src","dist"]}');
 
 /***/ })
 
@@ -6511,9 +6549,14 @@ const Config = acc.Config;
 const ROLE_SESSION_NAME = 'github-action-session';
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
-  core.setOutput('aliyun-access-key-id', accessKeyId);
-  core.setOutput('aliyun-access-key-secret', accessKeySecret);
-  core.setOutput('aliyun-security-token', securityToken);
+  core.setSecret('aliyun-access-key-id', accessKeyId);
+  core.setSecret('aliyun-access-key-secret', accessKeySecret);
+  core.setSecret('aliyun-security-token', securityToken);
+  // use standard environment variables
+  core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
+  core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
+  core.exportVariable('ALIBABA_CLOUD_SECURITY_TOKEN', securityToken);
+  // keep it for compatibility
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_SECRET', accessKeySecret);
   core.exportVariable('ALIBABACLOUD_SECURITY_TOKEN', securityToken);
@@ -6536,10 +6579,8 @@ async function run() {
       roleSessionName: ROLE_SESSION_NAME
     });
     const client = new CredentialClient(config);
-    const accessKeyId = await client.getAccessKeyId();
-    const accesskeySecret = await client.getAccessKeySecret();
-    const securityToken = await client.getSecurityToken();
-    setOutput(accessKeyId, accesskeySecret, securityToken);
+    const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
+    setOutput(accessKeyId, accessKeySecret, securityToken);
     return;
   }
 
@@ -6547,9 +6588,7 @@ async function run() {
     type: 'ecs_ram_role'
   });
   const client = new CredentialClient(config);
-  const accessKeyId = await client.getAccessKeyId();
-  const accessKeySecret = await client.getAccessKeySecret();
-  const securityToken = await client.getSecurityToken();
+  const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
 
   if (roleToAssume) {
     const config = new Config({
@@ -6563,9 +6602,7 @@ async function run() {
 
     {
       const cred = new CredentialClient(config);
-      const accessKeyId = await cred.getAccessKeyId();
-      const accessKeySecret = await cred.getAccessKeySecret();
-      const securityToken = await cred.getSecurityToken();
+      const { accessKeyId, accessKeySecret, securityToken } = await cred.getCredential();
       setOutput(accessKeyId, accessKeySecret, securityToken);
     }
 
@@ -6579,6 +6616,7 @@ async function run() {
 
 if (require.main === require.cache[eval('__filename')]) {
   run().catch((err) => {
+    console.log(err.stack);
     core.setFailed(err.message);
   });
 }

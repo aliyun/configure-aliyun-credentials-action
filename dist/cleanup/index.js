@@ -558,7 +558,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -2856,6 +2856,11 @@ var __webpack_exports__ = {};
 
 const core = __nccwpck_require__(186);
 
+// use standard environment variables
+core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', '');
+core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', '');
+core.exportVariable('ALIBABA_CLOUD_SECURITY_TOKEN', '');
+// keep it for compatibility
 core.exportVariable('ALIBABACLOUD_ACCESS_KEY_ID', '');
 core.exportVariable('ALIBABACLOUD_ACCESS_KEY_SECRET', '');
 core.exportVariable('ALIBABACLOUD_SECURITY_TOKEN', '');
