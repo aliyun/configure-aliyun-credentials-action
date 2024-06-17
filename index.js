@@ -13,9 +13,14 @@ const Config = acc.Config;
 const ROLE_SESSION_NAME = 'github-action-session';
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
-  core.setOutput('aliyun-access-key-id', accessKeyId);
-  core.setOutput('aliyun-access-key-secret', accessKeySecret);
-  core.setOutput('aliyun-security-token', securityToken);
+  core.setSecret('aliyun-access-key-id', accessKeyId);
+  core.setSecret('aliyun-access-key-secret', accessKeySecret);
+  core.setSecret('aliyun-security-token', securityToken);
+  // use standard environment variables
+  core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
+  core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
+  core.exportVariable('ALIBABA_CLOUD_SECURITY_TOKEN', securityToken);
+  // keep it for compatibility
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_SECRET', accessKeySecret);
   core.exportVariable('ALIBABACLOUD_SECURITY_TOKEN', securityToken);
@@ -38,10 +43,8 @@ async function run() {
       roleSessionName: ROLE_SESSION_NAME
     });
     const client = new CredentialClient(config);
-    const accessKeyId = await client.getAccessKeyId();
-    const accesskeySecret = await client.getAccessKeySecret();
-    const securityToken = await client.getSecurityToken();
-    setOutput(accessKeyId, accesskeySecret, securityToken);
+    const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
+    setOutput(accessKeyId, accessKeySecret, securityToken);
     return;
   }
 
@@ -49,9 +52,7 @@ async function run() {
     type: 'ecs_ram_role'
   });
   const client = new CredentialClient(config);
-  const accessKeyId = await client.getAccessKeyId();
-  const accessKeySecret = await client.getAccessKeySecret();
-  const securityToken = await client.getSecurityToken();
+  const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
 
   if (roleToAssume) {
     const config = new Config({
@@ -65,9 +66,7 @@ async function run() {
 
     {
       const cred = new CredentialClient(config);
-      const accessKeyId = await cred.getAccessKeyId();
-      const accessKeySecret = await cred.getAccessKeySecret();
-      const securityToken = await cred.getSecurityToken();
+      const { accessKeyId, accessKeySecret, securityToken } = await cred.getCredential();
       setOutput(accessKeyId, accessKeySecret, securityToken);
     }
 
