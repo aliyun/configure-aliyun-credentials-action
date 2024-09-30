@@ -19,6 +19,6 @@
     "@alicloud/credentials": "^2.3.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.1"
+    "@vercel/ncc": "^0.38.2"
   }
 }
