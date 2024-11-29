@@ -16,7 +16,7 @@ jobs:
       - name: Set up aliyun CLI
         uses: aliyun/setup-aliyun-cli-action@v1-beta
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: npm install
       - run: npm run build
