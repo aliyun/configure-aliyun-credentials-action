@@ -37,11 +37,23 @@ The alibaba cloud security token for the provided credentials.
 
 ### Using with OIDC
 
+#### Using OIDC native RAM Role
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
   oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
+```
+#### Using Fine Grained Resource RAM Role
+
+```yaml
+uses: aliyun/configure-aliyun-credentials-action@v1
+with:
+  oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
+  role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
+  resource-role-to-assume: 'acs:ram::USER_Id:role/Resource_ROLE_NAME'
+  role-session-expiration: 900
+  role-session-name: 'an-oidc-job-example'
 ```
 
 ### Using with ECS RAM role
@@ -49,17 +61,17 @@ with:
 If you run your GitHub Actions in a [self-hosted runner](https://help.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners)
 that already has configured with RAM role, such as ECS/ECI instance, then you do not need
 to provide any credentials to this action.
-
+#### Using ECS native attached RAM Role
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
 ```
-
-When you want to assume another role, use `role-to-assume` please.
+#### Using Fine Grained Resource RAM Role
+When you want to assume resource specific RAM role, use `resource-role-to-assume` please.
 
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
 with:
-  role-to-assume: 'acs:ram::USER_Id:role/ROLENAME'
+  resource-role-to-assume: 'acs:ram::USER_Id:role/Resource_ROLE_NAME'
 ```
 
 ## License Summary

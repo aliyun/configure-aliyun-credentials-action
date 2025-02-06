@@ -10,19 +10,23 @@ const acc = require('@alicloud/credentials');
 const CredentialClient = acc.default;
 const Config = acc.Config;
 
-const ROLE_SESSION_NAME = 'github-action-session';
+const ROLE_SESSION_NAME = core.getInput('role-session-name');
+const roleToAssume = core.getInput('role-to-assume');
+const oidcProviderArn = core.getInput('oidc-provider-arn');
+const roleSessionExpiration = core.getInput('role-session-expiration', { required: false });
+const resourceRoleArn = core.getInput('resource-role-to-assume', { required: false });
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
   core.setSecret(accessKeyId);
   core.setSecret(accessKeySecret);
   core.setSecret(securityToken);
-  core.setOutput('aliyun-access-key-id', accessKeyId);
-  core.setOutput('aliyun-access-key-secret', accessKeySecret);
-  core.setOutput('aliyun-security-token', securityToken);
   // use standard environment variables
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
   core.exportVariable('ALIBABA_CLOUD_SECURITY_TOKEN', securityToken);
+  core.exportVariable('ALICLOUD_ACCESS_KEY', accessKeyId);
+  core.exportVariable('ALICLOUD_SECRET_KEY', accessKeySecret);
+  core.exportVariable('ALICLOUD_SECURITY_TOKEN', securityToken);
   // keep it for compatibility
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_SECRET', accessKeySecret);
@@ -30,8 +34,7 @@ function setOutput(accessKeyId, accessKeySecret, securityToken) {
 }
 
 async function run() {
-  const roleToAssume = core.getInput('role-to-assume');
-  const oidcProviderArn = core.getInput('oidc-provider-arn');
+  
   if (roleToAssume && oidcProviderArn) {
     const audience = core.getInput('audience');
     const idToken = await core.getIDToken(audience);
@@ -43,10 +46,32 @@ async function run() {
       roleArn: roleToAssume,
       oidcProviderArn,
       oidcTokenFilePath,
+      roleSessionExpiration,
       roleSessionName: ROLE_SESSION_NAME
     });
     const client = new CredentialClient(config);
     const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
+    if (resourceRoleArn){
+      core.info('OIDC user Assuming Resource Role...')
+      const res_config = new Config({
+        type: 'ram_role_arn',
+        accessKeyId: accessKeyId,
+        accessKeySecret: accessKeySecret,
+        securityToken: securityToken,
+        roleArn: resourceRoleArn,
+        roleSessionExpiration,
+        roleSessionName: ROLE_SESSION_NAME
+      });
+
+      {
+        const res_cred = new CredentialClient(res_config);
+        const res_accessKeyId = await res_cred.getAccessKeyId();
+        const res_accessKeySecret = await res_cred.getAccessKeySecret();
+        const res_securityToken = await res_cred.getSecurityToken();
+        setOutput(res_accessKeyId, res_accessKeySecret, res_securityToken);
+      }
+      return;
+    }
     setOutput(accessKeyId, accessKeySecret, securityToken);
     return;
   }
@@ -57,13 +82,14 @@ async function run() {
   const client = new CredentialClient(config);
   const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
 
-  if (roleToAssume) {
+  if (resourceRoleArn) {
     const config = new Config({
       type: 'ram_role_arn',
       accessKeyId,
       accessKeySecret,
       securityToken,
-      roleArn: roleToAssume,
+      roleArn: resourceRoleArn,
+      roleSessionExpiration,
       roleSessionName: ROLE_SESSION_NAME
     });
 
