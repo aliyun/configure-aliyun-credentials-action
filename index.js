@@ -10,19 +10,22 @@ const acc = require('@alicloud/credentials');
 const CredentialClient = acc.default;
 const Config = acc.Config;
 
-const ROLE_SESSION_NAME = 'github-action-session';
+const ROLE_SESSION_NAME = core.getInput('role-session-name', { required: false });
+const roleToAssume = core.getInput('role-to-assume', { required: false });
+const oidcProviderArn = core.getInput('oidc-provider-arn');
+const roleSessionExpiration = core.getInput('role-session-expiration', { required: false });
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
   core.setSecret(accessKeyId);
   core.setSecret(accessKeySecret);
   core.setSecret(securityToken);
-  core.setOutput('aliyun-access-key-id', accessKeyId);
-  core.setOutput('aliyun-access-key-secret', accessKeySecret);
-  core.setOutput('aliyun-security-token', securityToken);
   // use standard environment variables
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
   core.exportVariable('ALIBABA_CLOUD_SECURITY_TOKEN', securityToken);
+  core.exportVariable('ALICLOUD_ACCESS_KEY', accessKeyId);
+  core.exportVariable('ALICLOUD_SECRET_KEY', accessKeySecret);
+  core.exportVariable('ALICLOUD_SECURITY_TOKEN', securityToken);
   // keep it for compatibility
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABACLOUD_ACCESS_KEY_SECRET', accessKeySecret);
@@ -30,8 +33,7 @@ function setOutput(accessKeyId, accessKeySecret, securityToken) {
 }
 
 async function run() {
-  const roleToAssume = core.getInput('role-to-assume');
-  const oidcProviderArn = core.getInput('oidc-provider-arn');
+  
   if (roleToAssume && oidcProviderArn) {
     const audience = core.getInput('audience');
     const idToken = await core.getIDToken(audience);
@@ -43,6 +45,7 @@ async function run() {
       roleArn: roleToAssume,
       oidcProviderArn,
       oidcTokenFilePath,
+      roleSessionExpiration,
       roleSessionName: ROLE_SESSION_NAME
     });
     const client = new CredentialClient(config);
@@ -64,6 +67,7 @@ async function run() {
       accessKeySecret,
       securityToken,
       roleArn: roleToAssume,
+      roleSessionExpiration,
       roleSessionName: ROLE_SESSION_NAME
     });
 
