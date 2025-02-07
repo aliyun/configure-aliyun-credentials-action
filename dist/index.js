@@ -32445,7 +32445,6 @@ const ROLE_SESSION_NAME = core.getInput('role-session-name', { required: false }
 const roleToAssume = core.getInput('role-to-assume', { required: false });
 const oidcProviderArn = core.getInput('oidc-provider-arn');
 const roleSessionExpiration = core.getInput('role-session-expiration', { required: false });
-const resourceRoleArn = core.getInput('resource-role-to-assume', { required: false });
 
 function setOutput(accessKeyId, accessKeySecret, securityToken) {
   core.setSecret(accessKeyId);
@@ -32482,25 +32481,6 @@ async function run() {
     });
     const client = new CredentialClient(config);
     const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
-    if (resourceRoleArn){
-      core.info('OIDC user Assuming Resource Role...')
-      const res_config = new Config({
-        type: 'ram_role_arn',
-        accessKeyId: accessKeyId,
-        accessKeySecret: accessKeySecret,
-        securityToken: securityToken,
-        roleArn: resourceRoleArn,
-        roleSessionExpiration,
-        roleSessionName: ROLE_SESSION_NAME
-      });
-
-      {
-        const res_cred = new CredentialClient(res_config);
-        const { accessKeyId, accessKeySecret, securityToken } = await res_cred.getCredential();
-        setOutput(accessKeyId, accessKeySecret, securityToken);
-      }
-      return;
-    }
     setOutput(accessKeyId, accessKeySecret, securityToken);
     return;
   }
@@ -32511,13 +32491,13 @@ async function run() {
   const client = new CredentialClient(config);
   const { accessKeyId, accessKeySecret, securityToken } = await client.getCredential();
 
-  if (resourceRoleArn) {
+  if (roleToAssume) {
     const config = new Config({
       type: 'ram_role_arn',
       accessKeyId,
       accessKeySecret,
       securityToken,
-      roleArn: resourceRoleArn,
+      roleArn: roleToAssume,
       roleSessionExpiration,
       roleSessionName: ROLE_SESSION_NAME
     });

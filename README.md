@@ -44,17 +44,6 @@ with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
   oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
 ```
-#### Using Fine Grained Resource RAM Role
-
-```yaml
-uses: aliyun/configure-aliyun-credentials-action@v1
-with:
-  oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
-  role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
-  resource-role-to-assume: 'acs:ram::USER_Id:role/Resource_ROLE_NAME'
-  role-session-expiration: 900
-  role-session-name: 'an-oidc-job-example'
-```
 
 ### Using with ECS RAM role
 
@@ -65,13 +54,13 @@ to provide any credentials to this action.
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
 ```
-#### Using Fine Grained Resource RAM Role
-When you want to assume resource specific RAM role, use `resource-role-to-assume` please.
+#### Assuming Specific RAM Role
+When you want to assume resource specific RAM role, specify with `role-to-assume` please.
 
 ```yaml
 uses: aliyun/configure-aliyun-credentials-action@v1
 with:
-  resource-role-to-assume: 'acs:ram::USER_Id:role/Resource_ROLE_NAME'
+  role-to-assume: 'acs:ram::USER_Id:role/ROLENAME'
 ```
 
 ## License Summary
