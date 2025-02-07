@@ -14,7 +14,7 @@ jobs:
       id-token: write
     steps:
       - name: Set up aliyun CLI
-        uses: aliyun/setup-aliyun-cli-action@v1-beta
+        uses: aliyun/setup-aliyun-cli-action@v1
 
       - uses: actions/checkout@v4
 
