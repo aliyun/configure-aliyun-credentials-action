@@ -12,13 +12,16 @@ inputs:
     required: false
     default: 1800
   role-session-name:
-    description: 'Role session name (default: GitHubActions)'
+    description: 'Role session name'
     required: false
     default: 'github-action-session'
   audience:
     description: 'The audience to use for the OIDC provider'
     required: false
     default: 'sts.aliyuncs.com'
+  role-chaining:
+    description: 'Whether to use role chaining. Use existing credentials to assume another role'
+    required: false
 
 outputs:
   aliyun-access-key-id:
