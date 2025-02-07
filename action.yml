@@ -5,7 +5,7 @@ inputs:
     description: 'The ARN of OIDC provider. format: acs:ram::USER_Id:oidc-provider/ROLE_NAME'
     required: false
   role-to-assume:
-    description: 'The ARN of role to assume. format: acs:ram::USER_Id:role/ROLE_NAME'
+    description: 'Required for OIDC user. The ARN of role to assume. format: acs:ram::USER_Id:role/ROLE_NAME'
     required: false
   role-session-expiration:
     description: "Role roleSessionExpiration in seconds (default: 6 hours, 1 hour for OIDC/specified alicloud-security-token)"

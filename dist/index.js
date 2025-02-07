@@ -32442,7 +32442,7 @@ const CredentialClient = acc.default;
 const Config = acc.Config;
 
 const ROLE_SESSION_NAME = core.getInput('role-session-name', { required: false });
-const roleToAssume = core.getInput('role-to-assume');
+const roleToAssume = core.getInput('role-to-assume', { required: false });
 const oidcProviderArn = core.getInput('oidc-provider-arn');
 const roleSessionExpiration = core.getInput('role-session-expiration', { required: false });
 const resourceRoleArn = core.getInput('resource-role-to-assume', { required: false });
