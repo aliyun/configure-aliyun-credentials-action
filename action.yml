@@ -14,6 +14,7 @@ inputs:
   role-session-name:
     description: 'Role session name (default: GitHubActions)'
     required: false
+    default: 'github-action-session'
   resource-role-to-assume:
     description: 'In fine-grained access control mode, each resouce access is granted with separate Aliyun RAM Role, assumed by role-to-assume defined role. format: acs:ram::USER_Id:role/ROLE_NAME'
     required: false

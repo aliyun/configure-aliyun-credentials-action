@@ -10,7 +10,7 @@ const acc = require('@alicloud/credentials');
 const CredentialClient = acc.default;
 const Config = acc.Config;
 
-const ROLE_SESSION_NAME = core.getInput('role-session-name');
+const ROLE_SESSION_NAME = core.getInput('role-session-name', { required: false });
 const roleToAssume = core.getInput('role-to-assume');
 const oidcProviderArn = core.getInput('oidc-provider-arn');
 const roleSessionExpiration = core.getInput('role-session-expiration', { required: false });
@@ -65,10 +65,8 @@ async function run() {
 
       {
         const res_cred = new CredentialClient(res_config);
-        const res_accessKeyId = await res_cred.getAccessKeyId();
-        const res_accessKeySecret = await res_cred.getAccessKeySecret();
-        const res_securityToken = await res_cred.getSecurityToken();
-        setOutput(res_accessKeyId, res_accessKeySecret, res_securityToken);
+        const { accessKeyId, accessKeySecret, securityToken } = await res_cred.getCredential();
+        setOutput(accessKeyId, accessKeySecret, securityToken);
       }
       return;
     }
