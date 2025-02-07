@@ -29,3 +29,12 @@ jobs:
 
       - name: Who am I
         run: aliyun sts GetCallerIdentity --region cn-hangzhou
+
+      - name: Configure credentials with another role
+        uses: ./
+        with:
+          role-to-assume: ${{ secrets.SECOND_ROLE_TO_ASSUME }}
+          role-chaining: true
+
+      - name: Who am I
+        run: aliyun sts GetCallerIdentity --region cn-hangzhou
