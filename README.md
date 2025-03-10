@@ -15,9 +15,18 @@ Environment variable exports are detected by both the Alibaba Cloud SDKs and the
 
 **Optional**: The ARN of role to assume. format: `acs:ram::USER_Id:role/ROLE_NAME` .
 
+### `role-session-name`
+**Optional**: The role session name. default: `github-action-session`.
+
+### `role-session-expiration`
+**Optional**: Role roleSessionExpiration in seconds (default: 1800 seconds).
+
 ### `audience`
 
 **Optional**: The audience to use for the OIDC provider. default: `github-actions`.
+
+### `role-chaining`
+**Optional**: Whether to use role chaining. Use existing credentials to assume another role.
 
 ## Outputs
 
@@ -44,7 +53,11 @@ uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLE_NAME'
   oidc-provider-arn: 'acs:ram::USER_Id:oidc-provider/PROVIDER_NAME'
+  role-session-name: 'github-action-session'
+  role-session-expiration: 1800
+  audience: 'github-actions'
 ```
+In the above example, role-session-name, role-session-expiration and audience are optional.
 
 ### Using with ECS RAM role
 
@@ -66,7 +79,10 @@ When you want to assume resource specific RAM role, specify with `role-to-assume
 uses: aliyun/configure-aliyun-credentials-action@v1
 with:
   role-to-assume: 'acs:ram::USER_Id:role/ROLENAME'
+  role-session-name: 'github-action-session'
+  role-session-expiration: 1800
 ```
+In the above example, role-session-name and role-session-expiration are optional.
 
 ### Assume role with role previouly assumed
 
@@ -79,8 +95,11 @@ When the credentials from OIDC or ECS RAM role can't meet your requirements, you
   uses: aliyun/configure-aliyun-credentials-action@v1
   with:
     role-to-assume: 'acs:ram::USER_Id:role/ROLENAME'
-    role-chain: true # must set to true
+    role-chaining: true # must set to true
+    role-session-name: 'github-action-session'
+    role-session-expiration: 1800
 ```
+In the above example, role-session-name and role-session-expiration are optional.
 
 ## License Summary
 
