@@ -23,6 +23,9 @@ function setOutput(accessKeyId, accessKeySecret, securityToken) {
   core.setSecret(accessKeyId);
   core.setSecret(accessKeySecret);
   core.setSecret(securityToken);
+  core.setOutput('aliyun-access-key-id', accessKeyId);
+  core.setOutput('aliyun-access-key-secret', accessKeySecret);
+  core.setOutput('aliyun-security-token', securityToken);
   // use standard environment variables
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_ID', accessKeyId);
   core.exportVariable('ALIBABA_CLOUD_ACCESS_KEY_SECRET', accessKeySecret);
