@@ -23,7 +23,7 @@ Environment variable exports are detected by both the Alibaba Cloud SDKs and the
 
 ### `audience`
 
-**Optional**: The audience to use for the OIDC provider. default: `github-actions`.
+**Optional**: The audience to use for the OIDC provider. default: `sts.aliyuncs.com`.
 
 ### `role-chaining`
 **Optional**: Whether to use role chaining. Use existing credentials to assume another role.
