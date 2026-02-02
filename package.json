@@ -20,7 +20,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^3.0.0",
     "@alicloud/credentials": "^2.4.1"
   },
   "devDependencies": {
