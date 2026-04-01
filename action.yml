@@ -32,7 +32,7 @@ outputs:
     description: The alibaba cloud security token for the provided credentials
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/main/index.js'
   post: 'dist/cleanup/index.js'
 
